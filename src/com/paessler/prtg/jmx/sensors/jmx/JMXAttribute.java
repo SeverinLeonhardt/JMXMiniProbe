@@ -35,11 +35,14 @@ import java.util.regex.Pattern;
 
 import javax.management.openmbean.CompositeDataSupport;
 
+import com.paessler.prtg.jmx.Logger;
 import com.paessler.prtg.jmx.channels.Channel;
 import com.paessler.prtg.jmx.channels.Channel.Unit;
 import com.paessler.prtg.jmx.channels.FloatChannel;
 import com.paessler.prtg.jmx.channels.LongChannel;
 import com.paessler.prtg.jmx.sensors.profile.Attribute;
+
+import javax.management.openmbean.CompositeData;
 
 public class JMXAttribute {
 	public static String SEPARATOR_STRING = ".";
@@ -188,7 +191,9 @@ public class JMXAttribute {
 	                retVal = new LongChannel(descr, getUnit(), val);
 	            } else if (obj instanceof Float || obj instanceof Double) {
 	                float val = adjustValue(number.floatValue());
-	                retVal = new FloatChannel(descr, getUnit(), val);
+	                if (Float.isFinite(val)) {
+	                	retVal = new FloatChannel(descr, getUnit(), val);
+	                }
 	            }
 	        } else if(obj instanceof CompositeDataSupport) {
 	        	CompositeDataSupport cd = (CompositeDataSupport)obj;
@@ -202,6 +207,22 @@ public class JMXAttribute {
 	                retVal.setMessage(toString()+": element["+key+"] not found ");
 	        	}
 	        }
+		else if (obj instanceof java.util.List)
+		{
+			java.util.List<?> list = (java.util.List<?>) obj;
+			
+			retVal = new LongChannel(getDescription(), getUnit(), list.size());
+			
+		}
+		else if (obj instanceof Boolean)
+		{
+			Boolean bool = (Boolean) obj;
+			retVal = new LongChannel(getDescription(), getUnit(), bool ? 1 : 0);
+		}
+		else
+		{
+			Logger.log("Unsupported object type: " + obj.getClass().getName());
+		}
 		}
 		return retVal;
 	}
