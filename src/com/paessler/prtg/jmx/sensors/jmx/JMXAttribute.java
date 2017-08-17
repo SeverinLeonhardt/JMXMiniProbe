@@ -74,9 +74,9 @@ public class JMXAttribute {
 		for(String curr: object){
 			if(!isFirst){
 				retVal.append(sep);
-				isFirst = false;
 			}
     		retVal.append(curr);
+			isFirst = false;
 		}
     	return retVal.toString();
     }
@@ -185,7 +185,7 @@ public class JMXAttribute {
 		if(isObjectIndexValid(index)){
 	        if (obj instanceof Number) {
 	            Number number = (Number) obj;
-	            String descr = getDescription(" - ");
+	            String descr = getDescription(".");
 	            if (obj instanceof Integer || obj instanceof Long) {
 	                long val = adjustValue(number.longValue());
 	                retVal = new LongChannel(descr, getUnit(), val);
